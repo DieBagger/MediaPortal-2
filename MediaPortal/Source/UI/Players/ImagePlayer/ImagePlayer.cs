@@ -24,6 +24,7 @@
 
 using System;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Threading;
 using MediaPortal.Common;
@@ -37,6 +38,7 @@ using MediaPortal.UI.Presentation.Players;
 using MediaPortal.UI.SkinEngine.Players;
 using MediaPortal.UI.SkinEngine.SkinManagement;
 using MediaPortal.Utilities;
+using MediaPortal.Utilities.Graphics;
 using SlimDX.Direct3D9;
 using RightAngledRotation = MediaPortal.UI.Presentation.Players.RightAngledRotation;
 
@@ -234,8 +236,13 @@ namespace MediaPortal.UI.Players.Image
       ImageInformation imageInformation;
       using (IResourceAccessor ra = locator.CreateAccessor())
       using (Stream stream = ra.OpenRead())
-        texture = Texture.FromStream(SkinContext.Device, stream, (int) stream.Length, 0, 0, 1, Usage.None,
+      {
+        using (Stream tmpImageStream = ImageUtilities.ResizeImage(stream, ImageFormat.MemoryBmp, 2048, 2048))
+        {
+          texture = Texture.FromStream(SkinContext.Device, tmpImageStream, (int) tmpImageStream.Length, 0, 0, 1, Usage.None,
             Format.A8R8G8B8, Pool.Default, Filter.None, Filter.None, 0, out imageInformation);
+        }
+      }
       lock (_syncObj)
       {
         ReloadSettings();
@@ -468,7 +475,7 @@ namespace MediaPortal.UI.Players.Image
         // Flatten progress function to be in the range 0-1
         if (animationProgress < 0)
           animationProgress = 0;
-        animationProgress = 1-1/(5*animationProgress*animationProgress+1);
+        animationProgress = 1 - 1 / (5 * animationProgress * animationProgress + 1);
         RectangleF textureClip = _animator.GetZoomRect(animationProgress, ImageSize, outputSize);
         return new RectangleF(textureClip.X * _textureMaxUV.Width, textureClip.Y * _textureMaxUV.Height, textureClip.Width * _textureMaxUV.Width, textureClip.Height * _textureMaxUV.Height);
       }
