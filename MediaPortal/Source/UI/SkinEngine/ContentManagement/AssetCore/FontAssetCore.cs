@@ -191,15 +191,14 @@ namespace MediaPortal.UI.SkinEngine.ContentManagement.AssetCore
     }
 
     /// <summary>
-    /// Get the height of a text block containing the specified number of lines. In order to get correct vertical 
-    /// centering we add an additonal value to compensate for the space required under the font's base line.
+    /// Get the height of a text block containing the specified number of lines.
     /// </summary>
     /// <param name="fontSize">The actual font size.</param>
     /// <param name="lineCount">The number of lines.</param>
     /// <returns>The height of the text.</returns>
     public float TextHeight(float fontSize, int lineCount)
     {
-      return LineHeight(fontSize) * (lineCount + 1) - Base(fontSize) - 1.0f;
+      return LineHeight(fontSize) * lineCount + 1f;
     }
 
     /// <summary>
@@ -399,7 +398,7 @@ namespace MediaPortal.UI.SkinEngine.ContentManagement.AssetCore
 
       List<PositionColoredTextured> verts = new List<PositionColoredTextured>();
       float[] lineWidth = new float[text.Length];
-      int liney = _charSet.RenderedSize - _charSet.Base;
+      int liney = 0;
       float sizeScale = size / _charSet.RenderedSize;
 
       lineIndex = new int[text.Length];
@@ -464,7 +463,9 @@ namespace MediaPortal.UI.SkinEngine.ContentManagement.AssetCore
       x += c.XOffset;
       y += c.YOffset;
       PositionColoredTextured tl = new PositionColoredTextured(
-          x * sizeScale, y * sizeScale, 1.0f,
+          x * sizeScale,
+          y * sizeScale,
+          1.0f,
           (c.X + 0.5f) / _charSet.Width,
           c.Y / (float) _charSet.Height,
           0
